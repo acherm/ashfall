@@ -2351,6 +2351,7 @@ export function createEnemyManager({ scene, world, fx, audio, hud, player }) {
     setStartLevel,
     get level() { return level; },
     get difficultyName() { return diffName(level); },
+    get kills() { return kills; },
   };
   // shot-harness debug handle (mirrors main.js's window.__player pattern)
   if (window.__SHOT_MODE__) window.__enemies = mgr;

@@ -177,6 +177,36 @@ window.addEventListener('keydown', (e) => {
   if (dead && (e.code === 'KeyR' || e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter')) redeploy();
 });
 
+// ---------------------------------------------------------------- victory
+// A win condition: eliminate a target number of hostiles → MISSION COMPLETE.
+const WIN_KILLS = Math.max(20, +params.get('win') || 100);
+const victoryEl = document.getElementById('victory');
+const victoryStats = document.getElementById('victoryStats');
+let won = false, runTime = 0;
+function showVictory() {
+  won = true;
+  document.exitPointerLock?.();
+  if (victoryStats) {
+    const secs = Math.round(runTime);
+    victoryStats.innerHTML =
+      `Hostiles eliminated: <b>${enemies.kills | 0}</b><br>`
+      + `Reached: <b>Level ${enemies.level | 0} · ${enemies.difficultyName || ''}</b><br>`
+      + `Time: <b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b>`;
+  }
+  victoryEl?.classList.add('show');
+}
+document.getElementById('victoryReplay')?.addEventListener('click', () => {
+  const q = [];
+  if (FOOTBALL) q.push('football=1');
+  if (startLevel > 1) q.push('level=' + startLevel);
+  location.search = q.length ? '?' + q.join('&') : '?';
+});
+document.getElementById('victoryContinue')?.addEventListener('click', () => {
+  victoryEl?.classList.remove('show');
+  hud.setObjective('ENDLESS — HOLD THE SECTOR');
+  if (!IS_TOUCH) input.requestLock();
+});
+
 // difficulty picker: chips set the starting level; ?level=N also works
 let startLevel = Math.max(1, Math.min(12, +params.get('level') || 1));
 const diffSel = document.getElementById('diffSel');
@@ -263,12 +293,12 @@ document.addEventListener('pointerlockchange', () => {
   else menu.classList.add('hidden');
 });
 
-hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : 'ELIMINATE HOSTILE FORCES');
+hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : ('ELIMINATE ' + WIN_KILLS + ' HOSTILES'));
 hud.setHealth(100);
 hud.setAmmo(30, 150);
 if (!FOOTBALL) hud.setGrenades?.(nades);
 
-if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; window.__net = net; window.__R = R; } // test hook
+if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; window.__net = net; window.__R = R; window.__mkv = (x, y, z) => new THREE.Vector3(x, y, z); } // test hook
 
 // ---------------------------------------------------------------- shot mode
 let shotFrames = 0;
@@ -443,6 +473,12 @@ function tick(dt) {
     hud.update(dt);
     hud.setCompassYaw(player.yaw + Math.PI); // -Z (down the street) reads as North
     audio.update(player.getEyePos(), player.yaw);
+
+    // win condition: eliminate the target number of hostiles (combat mode)
+    if (!SHOT && !FOOTBALL && !won && player.alive !== false) {
+      runTime += dt;
+      if ((enemies.kills | 0) >= WIN_KILLS) showVictory();
+    }
 
     // death → K.I.A. screen after the slump plays, then redeploy on input
     if (!SHOT && player.alive === false) {
