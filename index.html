@@ -2,12 +2,39 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>ASHFALL</title>
 <style>
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0c0e; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0c0e;
+               touch-action: none; -webkit-user-select: none; user-select: none;
+               -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
   #app { position: fixed; inset: 0; }
-  canvas { display: block; width: 100%; height: 100%; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  /* ---- mobile touch controls (shown only on touch devices via #touch.on) ---- */
+  #touch { position: fixed; inset: 0; z-index: 12; display: none; touch-action: none; }
+  #touch.on { display: block; }
+  #tstick { position: fixed; width: 130px; height: 130px; margin: -65px 0 0 -65px;
+            border-radius: 50%; border: 2px solid rgba(230,235,240,0.28);
+            background: rgba(180,190,200,0.08); display: none; pointer-events: none; }
+  #tknob { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px;
+           margin: -29px 0 0 -29px; border-radius: 50%;
+           background: rgba(220,228,235,0.30); border: 2px solid rgba(230,235,240,0.5); }
+  .tbtn { position: fixed; display: flex; align-items: center; justify-content: center;
+          border-radius: 50%; background: rgba(20,26,32,0.42); color: #dfe4e8;
+          border: 1.5px solid rgba(220,228,235,0.35); font-family: "Helvetica Neue", Arial, sans-serif;
+          font-size: 12px; letter-spacing: 1px; text-transform: uppercase; user-select: none;
+          -webkit-user-select: none; }
+  .tbtn.down { background: rgba(220,180,110,0.55); border-color: #ffd27a; color: #10151b; }
+  .tbtn.big { width: 96px; height: 96px; font-size: 15px; }
+  .tbtn.sm { width: 46px; height: 46px; font-size: 15px; }
+  #tfire { right: 26px; bottom: 118px; }
+  #taim { right: 138px; bottom: 150px; width: 74px; height: 74px; }
+  #tjump { right: 40px; bottom: 232px; width: 70px; height: 70px; }
+  #tcrouch { right: 150px; bottom: 60px; width: 70px; height: 70px; }
+  #treload { right: 232px; bottom: 96px; width: 66px; height: 66px; }
+  #tsprint { left: 172px; bottom: 210px; width: 66px; height: 66px; }
+  #tinteract { left: 30px; bottom: 210px; width: 66px; height: 66px; }
+  #twslots { position: fixed; right: 20px; top: 96px; display: flex; gap: 10px; }
   #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10;
          font-family: "Helvetica Neue", Arial, sans-serif; }
   #menu { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
@@ -49,11 +76,37 @@
               border: 1px solid rgba(220,225,230,0.4); padding: 13px 40px; text-transform: uppercase;
               animation: pulse 2s ease-in-out infinite; }
   #death .dhint { margin-top: 22px; font-size: 11px; letter-spacing: 2px; color: #6d635c; }
+  #hint { position: fixed; left: 50%; top: 84px; transform: translateX(-50%); z-index: 11;
+          pointer-events: none; text-align: center; font-family: "Helvetica Neue", Arial, sans-serif;
+          opacity: 0; transition: opacity 0.6s ease; }
+  #hint.show { opacity: 1; }
+  #hint .row1 { font-size: 15px; letter-spacing: 3px; color: #e6e9ec; text-shadow: 0 1px 6px rgba(0,0,0,0.7); }
+  #hint .row1 b { color: #ffd27a; font-weight: 700; }
+  #hint .row2 { margin-top: 8px; font-size: 11px; letter-spacing: 2px; color: #aeb4ba; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
 </style>
 </head>
 <body>
 <div id="app"><canvas id="game"></canvas></div>
 <div id="hud"></div>
+<div id="touch">
+  <div id="tstick"><div id="tknob"></div></div>
+  <div id="tfire" class="tbtn big">FIRE</div>
+  <div id="taim" class="tbtn">AIM</div>
+  <div id="tjump" class="tbtn">JUMP</div>
+  <div id="tcrouch" class="tbtn">DUCK</div>
+  <div id="treload" class="tbtn">R</div>
+  <div id="tsprint" class="tbtn">RUN</div>
+  <div id="tinteract" class="tbtn">E</div>
+  <div id="twslots">
+    <div id="tw1" class="tbtn sm">1</div>
+    <div id="tw2" class="tbtn sm">2</div>
+    <div id="tw3" class="tbtn sm">3</div>
+  </div>
+</div>
+<div id="hint">
+  <div class="row1"><b>1</b> Rifle &nbsp;&middot;&nbsp; <b>2</b> Pistol &nbsp;&middot;&nbsp; <b>3</b> Knife</div>
+  <div class="row2">Duck behind the dumpsters on the pavements to break line of sight</div>
+</div>
 <div id="menu">
   <h1>ASHFALL</h1>
   <div class="sub">Sector 9 &mdash; Urban Combat Operations</div>

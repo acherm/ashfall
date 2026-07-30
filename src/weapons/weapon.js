@@ -1952,10 +1952,10 @@ export function createWeapon({
     _f.vel = vel; _f.hspeed = hspeed;
     const f = _f;
 
-    // slot select — number row AND the Switch d-pad both emit Digit1/2/3
-    if (input.pressed('Digit1')) selectSlot('primary');
-    else if (input.pressed('Digit2')) selectSlot('pistol');
-    else if (input.pressed('Digit3')) selectSlot('knife');
+    // slot select — number row, numpad, AND the Switch d-pad all emit Digit1/2/3
+    if (input.pressed('Digit1') || input.pressed('Numpad1')) selectSlot('primary');
+    else if (input.pressed('Digit2') || input.pressed('Numpad2')) selectSlot('pistol');
+    else if (input.pressed('Digit3') || input.pressed('Numpad3')) selectSlot('knife');
 
     advanceSwap(dt);
 

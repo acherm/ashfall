@@ -25,6 +25,10 @@ const menu = document.getElementById('menu');
 
 const R = createRenderer({ canvas });
 const input = createInput(canvas);
+// touch device? → on-screen controls, no pointer lock
+const IS_TOUCH = (window.matchMedia && matchMedia('(pointer: coarse)').matches)
+  || 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
+input.initTouch?.();
 const world = createWorld(R.scene);
 const fx = createFX({ scene: R.scene, camera: R.camera });
 const hud = createHUD();
@@ -152,16 +156,31 @@ if (modeBtn) {
 menu.addEventListener('click', () => {
   audio.unlock();
   audio.ambience();
-  input.requestLock();
+  if (IS_TOUCH) {
+    input.touchActive = true;
+    document.getElementById('touch')?.classList.add('on');
+  } else {
+    input.requestLock();
+  }
   menu.classList.add('hidden');
   if (!started) {
     started = true;
     enemies.setStartLevel?.(startLevel);
     enemies.spawnWave(4);
   }
+  showHint();
 });
+
+// deploy hint: teaches weapon slots + cover, then fades
+const hintEl = document.getElementById('hint');
+let hintTimer = 0;
+function showHint() {
+  if (!hintEl) return;
+  hintEl.classList.add('show');
+  hintTimer = 9; // seconds visible before fading
+}
 document.addEventListener('pointerlockchange', () => {
-  if (dead) return; // death screen owns the pointer while KIA — don't pop the menu
+  if (dead || IS_TOUCH) return; // touch play doesn't use pointer lock at all
   if (!document.pointerLockElement && !SHOT && started) menu.classList.remove('hidden');
   else menu.classList.add('hidden');
 });
@@ -170,7 +189,7 @@ hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : 'ELIMINATE HOSTILE F
 hud.setHealth(100);
 hud.setAmmo(30, 150);
 
-if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; } // test hook
+if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; } // test hook
 
 // ---------------------------------------------------------------- shot mode
 let shotFrames = 0;
@@ -325,6 +344,7 @@ function tick(dt) {
     if (!driving) weapon.update(dt);
     fx.update(dt);
     if (fb) fb.update(dt);
+    if (hintTimer > 0) { hintTimer -= dt; if (hintTimer <= 0) hintEl?.classList.remove('show'); }
     hud.update(dt);
     hud.setCompassYaw(player.yaw + Math.PI); // -Z (down the street) reads as North
     audio.update(player.getEyePos(), player.yaw);

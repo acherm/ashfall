@@ -14,12 +14,13 @@ export function createInput(canvas) {
   let firePressedFlag = false;
 
   const active = () =>
-    document.pointerLockElement !== null || window.__SHOT_MODE__ === true;
+    document.pointerLockElement !== null || window.__SHOT_MODE__ === true || input.touchActive;
 
   const input = {
     fireHeld: false,
     aimHeld: false,
     locked: false,
+    touchActive: false,       // set true on touch devices — bypasses pointer lock
     // analog move vector from a gamepad left stick (0,0 when keyboard-driven);
     // player.js prefers it over digital keys when its magnitude is real
     moveX: 0,
@@ -263,6 +264,123 @@ export function createInput(canvas) {
       e.preventDefault();
     }
   });
+
+  // ---------------------------------------------------------------------------
+  // TOUCH CONTROLS — a floating left-thumb move stick, right-side look drag, and
+  // on-screen buttons that feed the SAME input state the mouse/keyboard/pad do
+  // (moveX/moveY, the accumulated look delta, fireHeld/aimHeld, and synthetic key
+  // codes). Wired to the #touch overlay in index.html; a no-op if it's absent.
+  input.initTouch = function initTouch() {
+    const root = document.getElementById('touch');
+    if (!root) return;
+    const stick = document.getElementById('tstick');
+    const knob = document.getElementById('tknob');
+    const RADIUS = 55;         // px travel for full deflection
+    const LOOK_SENS = 0.6;     // touch-drag px → look px (player applies its own sens)
+
+    let moveId = null, mox = 0, moy = 0;   // move-stick touch id + origin
+    let lookId = null, lpx = 0, lpy = 0;    // look touch id + last pos
+
+    const onBtn = (el, on) => { if (el) el.classList.toggle('down', on); };
+
+    function setStick(dx, dy) {
+      const len = Math.hypot(dx, dy) || 1;
+      const cl = Math.min(len, RADIUS);
+      const nx = (dx / len) * cl, ny = (dy / len) * cl;
+      input.moveX = nx / RADIUS;
+      input.moveY = ny / RADIUS;           // player reads f=-moveY, s=moveX
+      if (knob) knob.style.transform = `translate(${nx}px, ${ny}px)`;
+    }
+    function endStick() {
+      moveId = null; input.moveX = 0; input.moveY = 0;
+      if (stick) stick.style.display = 'none';
+      if (knob) knob.style.transform = 'translate(0,0)';
+    }
+
+    // a button: hold-to-press for a key code, or a callbacks pair
+    function bindHold(id, code) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('touchstart', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if (code === '__fire') { input.fireHeld = true; firePressedFlag = true; }
+        else if (code === '__aim') { input.aimHeld = true; }
+        else { down.add(code); pressedOnce.add(code); }
+        onBtn(el, true);
+      }, { passive: false });
+      const rel = (e) => {
+        if (e) { e.preventDefault(); e.stopPropagation(); }
+        if (code === '__fire') input.fireHeld = false;
+        else if (code === '__aim') input.aimHeld = false;
+        else down.delete(code);
+        onBtn(el, false);
+      };
+      el.addEventListener('touchend', rel, { passive: false });
+      el.addEventListener('touchcancel', rel, { passive: false });
+    }
+    // a tap button: one synthetic press (weapon slots, interact, reload)
+    function bindTap(id, code) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('touchstart', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        down.add(code); pressedOnce.add(code);
+        onBtn(el, true);
+      }, { passive: false });
+      const rel = (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } down.delete(code); onBtn(el, false); };
+      el.addEventListener('touchend', rel, { passive: false });
+      el.addEventListener('touchcancel', rel, { passive: false });
+    }
+
+    bindHold('tfire', '__fire');
+    bindHold('taim', '__aim');
+    bindHold('tjump', 'Space');
+    bindHold('tcrouch', 'ControlLeft');
+    bindTap('treload', 'KeyR');
+    bindTap('tinteract', 'KeyE');
+    bindTap('tsprint', 'ShiftLeft'); // hold-ish; toggled via down while pressed
+    bindHold('tsprint', 'ShiftLeft');
+    bindTap('tw1', 'Digit1');
+    bindTap('tw2', 'Digit2');
+    bindTap('tw3', 'Digit3');
+
+    // move zone = left ~45% of the screen; look zone = the rest. Buttons live on
+    // top with their own handlers + stopPropagation, so they never steal a touch.
+    root.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) {
+        const leftZone = t.clientX < window.innerWidth * 0.45;
+        if (leftZone && moveId === null) {
+          moveId = t.identifier; mox = t.clientX; moy = t.clientY;
+          if (stick) { stick.style.display = 'block'; stick.style.left = mox + 'px'; stick.style.top = moy + 'px'; }
+          setStick(0, 0);
+        } else if (!leftZone && lookId === null) {
+          lookId = t.identifier; lpx = t.clientX; lpy = t.clientY;
+        }
+      }
+    }, { passive: false });
+
+    root.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) {
+        if (t.identifier === moveId) setStick(t.clientX - mox, t.clientY - moy);
+        else if (t.identifier === lookId) {
+          accDx += (t.clientX - lpx) * LOOK_SENS;
+          accDy += (t.clientY - lpy) * LOOK_SENS;
+          lpx = t.clientX; lpy = t.clientY;
+        }
+      }
+    }, { passive: false });
+
+    const endTouch = (e) => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === moveId) endStick();
+        else if (t.identifier === lookId) lookId = null;
+      }
+    };
+    root.addEventListener('touchend', endTouch, { passive: false });
+    root.addEventListener('touchcancel', endTouch, { passive: false });
+  };
 
   return input;
 }
