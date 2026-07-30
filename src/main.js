@@ -11,6 +11,7 @@ import { createAudio } from './audio/audio.js';
 import { createFootballs } from './fx/footballs.js';
 import { createCars } from './vehicles/cars.js';
 import { createCivilians } from './world/civilians.js';
+import { createNetplay } from './net/netplay.js';
 
 const params = new URLSearchParams(location.search);
 const SHOT = params.has('shot');
@@ -97,6 +98,24 @@ const civilians = createCivilians({
   getThreats: () => (enemies.hitVolumes ? enemies.hitVolumes().map((v) => v.pos) : []),
 });
 
+// online co-op (stage 1): peer-to-peer, renders a blue teammate avatar
+const net = createNetplay({ scene: R.scene });
+let netSendT = 0, remoteFirePrev = false;
+const _rdir = new THREE.Vector3();
+net.onData?.((msg) => {
+  if (!msg || msg.t !== 'p') return;
+  net.applyRemote(msg);
+  if (msg.fire && !remoteFirePrev) {
+    const mz = net.remoteMuzzle();
+    if (mz) {
+      _rdir.set(-Math.sin(msg.yaw || 0), 0, -Math.cos(msg.yaw || 0));
+      fx.muzzleFlash(mz, _rdir);
+      fx.tracer(mz, _rdir.clone().multiplyScalar(80).add(mz));
+    }
+  }
+  remoteFirePrev = !!msg.fire;
+});
+
 // weapon-swap discard: weapon.js reaches the drops system through the array
 // itself (getDrops().addDrop) — bridge the enemies API onto its stable array
 if (enemies.drops && enemies.addDrop && !enemies.drops.addDrop) {
@@ -142,6 +161,32 @@ if (diffSel) {
   }));
   highlight();
 }
+
+// co-op menu: Host shows a room code, Join connects with one
+const coopHost = document.getElementById('coopHost');
+const coopJoin = document.getElementById('coopJoin');
+const coopCode = document.getElementById('coopCode');
+const coopStatus = document.getElementById('coopStatus');
+function setCoop(text, cls) { if (coopStatus) { coopStatus.textContent = text; coopStatus.className = cls || ''; } }
+net.onStatus?.((s, info) => {
+  if (s === 'hosting') setCoop('Share this code: ' + info, 'warn');
+  else if (s === 'connecting') setCoop('Connecting…', 'warn');
+  else if (s === 'connected') setCoop('Teammate connected — deploy!', 'ok');
+  else if (s === 'error') setCoop(info || 'Connection failed', 'err');
+  else if (s === 'closed') setCoop('Teammate disconnected', 'err');
+});
+coopHost?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  setCoop('Creating room…', 'warn');
+  net.host().then((code) => setCoop('Share this code: ' + code, 'warn')).catch(() => setCoop('Could not host', 'err'));
+});
+coopJoin?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const c = (coopCode?.value || '').trim();
+  if (c.length < 4) { setCoop('Enter the 4-character code', 'err'); return; }
+  setCoop('Joining…', 'warn');
+  net.join(c).then(() => setCoop('Connected — deploy!', 'ok')).catch(() => setCoop('Join failed — check the code', 'err'));
+});
 
 // mode toggle button: full reload so every module rebuilds for the other mode
 const modeBtn = document.getElementById('modeToggle');
@@ -193,7 +238,7 @@ hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : 'ELIMINATE HOSTILE F
 hud.setHealth(100);
 hud.setAmmo(30, 150);
 
-if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; } // test hook
+if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; window.__net = net; window.__R = R; } // test hook
 
 // ---------------------------------------------------------------- shot mode
 let shotFrames = 0;
@@ -348,6 +393,18 @@ function tick(dt) {
     if (!driving) weapon.update(dt);
     fx.update(dt);
     if (fb) fb.update(dt);
+    // co-op: broadcast our state ~20/s, interpolate the teammate every frame
+    if (net.connected) {
+      netSendT -= dt;
+      if (netSendT <= 0) {
+        netSendT = 0.05;
+        net.send({ t: 'p', x: player.position.x, y: player.position.y, z: player.position.z,
+          yaw: player.yaw, pitch: player.pitch, alive: player.alive !== false,
+          fire: !driving && !!input.fireHeld });
+      }
+    }
+    net.update(dt);
+
     if (hintTimer > 0) { hintTimer -= dt; if (hintTimer <= 0) hintEl?.classList.remove('show'); }
     hud.update(dt);
     hud.setCompassYaw(player.yaw + Math.PI); // -Z (down the street) reads as North

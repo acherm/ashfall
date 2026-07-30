@@ -68,6 +68,26 @@
   #menu .diff .chip:hover { color: #d6dde3; border-color: rgba(210,220,230,0.5); }
   #menu .diff .chip.sel { color: #10151b; background: #cdd4da; border-color: #cdd4da; font-weight: 600; }
   #menu .difflabel { margin-top: 16px; font-size: 10px; letter-spacing: 4px; color: #5c646c; text-transform: uppercase; }
+  /* ---- co-op menu block (IDs wired by main.js) ---- */
+  #menu .coop { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center;
+                justify-content: center; gap: 10px; max-width: 340px; }
+  #menu .coop .chip { font-size: 11px; letter-spacing: 3px; color: #9aa3ad;
+                border: 1px solid rgba(210,220,230,0.28); padding: 8px 16px;
+                text-transform: uppercase; cursor: pointer; transition: all .15s; }
+  #menu .coop .chip:hover { color: #d6dde3; border-color: rgba(210,220,230,0.5); }
+  #menu .coop .chip.sel { color: #10151b; background: #cdd4da; border-color: #cdd4da; font-weight: 600; }
+  #menu .coop .chip.disabled { opacity: 0.4; pointer-events: none; }
+  #coopCode { width: 90px; box-sizing: border-box; background: rgba(20,26,32,0.5);
+              border: 1px solid rgba(210,220,230,0.28); border-radius: 2px; color: #e8e6e1;
+              font: 13px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 4px;
+              text-transform: uppercase; text-align: center; padding: 9px 6px; outline: none; }
+  #coopCode:focus { border-color: rgba(214,185,106,0.7); }
+  #coopCode::placeholder { color: #5c646c; letter-spacing: 3px; }
+  #coopStatus { flex-basis: 100%; margin-top: 4px; min-height: 14px; text-align: center;
+                font-size: 11px; letter-spacing: 2px; color: #d6b96a; }
+  #coopStatus.warn { color: #d6b96a; }
+  #coopStatus.err { color: #d9736a; }
+  #coopStatus.ok { color: #7bc47f; }
   @keyframes pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
   #death { position: fixed; inset: 0; z-index: 25; display: none;
            flex-direction: column; align-items: center; justify-content: center;
@@ -125,6 +145,13 @@
   </div>
   <div class="start">Click to deploy</div>
   <div class="keys">WASD move &nbsp;&middot;&nbsp; Shift sprint &nbsp;&middot;&nbsp; RMB aim &nbsp;&middot;&nbsp; LMB fire &nbsp;&middot;&nbsp; R reload &nbsp;&middot;&nbsp; Ctrl crouch &nbsp;&middot;&nbsp; 1/2/3 weapon</div>
+  <div class="difflabel">Co-op (2 players)</div>
+  <div class="coop" id="coopBox" onclick="event.stopPropagation()">
+    <div class="chip" id="coopHost">Host game</div>
+    <div class="chip" id="coopJoin">Join</div>
+    <input id="coopCode" maxlength="4" placeholder="CODE" />
+    <div id="coopStatus"></div>
+  </div>
   <div id="modeToggle" class="mode"></div>
 </div>
 <div id="death">
