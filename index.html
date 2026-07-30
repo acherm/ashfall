@@ -13,12 +13,18 @@
   /* ---- mobile touch controls (shown only on touch devices via #touch.on) ---- */
   #touch { position: fixed; inset: 0; z-index: 12; display: none; touch-action: none; }
   #touch.on { display: block; }
-  #tstick { position: fixed; width: 130px; height: 130px; margin: -65px 0 0 -65px;
-            border-radius: 50%; border: 2px solid rgba(230,235,240,0.28);
-            background: rgba(180,190,200,0.08); display: none; pointer-events: none; }
-  #tknob { position: absolute; left: 50%; top: 50%; width: 58px; height: 58px;
-           margin: -29px 0 0 -29px; border-radius: 50%;
-           background: rgba(220,228,235,0.30); border: 2px solid rgba(230,235,240,0.5); }
+  /* movement joystick — visible at rest (bottom-left) so it's obvious, floats to
+     the thumb when touched. Shown whenever the touch overlay is on. */
+  #tstick { position: fixed; width: 138px; height: 138px;
+            border-radius: 50%; border: 2px dashed rgba(230,235,240,0.4);
+            background: rgba(180,190,200,0.10); display: none; pointer-events: none; }
+  #touch.on #tstick { display: block; }
+  #tknob { position: absolute; left: 50%; top: 50%; width: 62px; height: 62px;
+           margin: -31px 0 0 -31px; border-radius: 50%;
+           background: rgba(220,228,235,0.34); border: 2px solid rgba(230,235,240,0.6); }
+  #tstick::after { content: "MOVE"; position: absolute; left: 0; right: 0; top: -22px;
+           text-align: center; font: 11px/1 "Helvetica Neue", Arial; letter-spacing: 3px;
+           color: rgba(230,235,240,0.6); }
   .tbtn { position: fixed; display: flex; align-items: center; justify-content: center;
           border-radius: 50%; background: rgba(20,26,32,0.42); color: #dfe4e8;
           border: 1.5px solid rgba(220,228,235,0.35); font-family: "Helvetica Neue", Arial, sans-serif;

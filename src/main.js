@@ -171,13 +171,17 @@ menu.addEventListener('click', () => {
   showHint();
 });
 
-// deploy hint: teaches weapon slots + cover, then fades
+// deploy hint: teaches controls, then fades. On touch, spell out move/look.
 const hintEl = document.getElementById('hint');
 let hintTimer = 0;
+if (IS_TOUCH && hintEl) {
+  const r2 = hintEl.querySelector('.row2');
+  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick: drag to walk (up = forward) &nbsp;&middot;&nbsp; drag the <b>right side</b> to look &nbsp;&middot;&nbsp; buttons to fire / aim / jump';
+}
 function showHint() {
   if (!hintEl) return;
   hintEl.classList.add('show');
-  hintTimer = 9; // seconds visible before fading
+  hintTimer = IS_TOUCH ? 13 : 9; // give mobile players longer to read
 }
 document.addEventListener('pointerlockchange', () => {
   if (dead || IS_TOUCH) return; // touch play doesn't use pointer lock at all

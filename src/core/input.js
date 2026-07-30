@@ -283,6 +283,14 @@ export function createInput(canvas) {
 
     const onBtn = (el, on) => { if (el) el.classList.toggle('down', on); };
 
+    // rest the stick at a fixed bottom-left spot so the player SEES where to move
+    function restStick() {
+      if (!stick) return;
+      const cx = 106, cy = window.innerHeight - 116;
+      stick.style.left = (cx - 69) + 'px';
+      stick.style.top = (cy - 69) + 'px';
+      if (knob) knob.style.transform = 'translate(0,0)';
+    }
     function setStick(dx, dy) {
       const len = Math.hypot(dx, dy) || 1;
       const cl = Math.min(len, RADIUS);
@@ -293,8 +301,7 @@ export function createInput(canvas) {
     }
     function endStick() {
       moveId = null; input.moveX = 0; input.moveY = 0;
-      if (stick) stick.style.display = 'none';
-      if (knob) knob.style.transform = 'translate(0,0)';
+      restStick();                         // return to the visible resting base
     }
 
     // a button: hold-to-press for a key code, or a callbacks pair
@@ -352,7 +359,8 @@ export function createInput(canvas) {
         const leftZone = t.clientX < window.innerWidth * 0.45;
         if (leftZone && moveId === null) {
           moveId = t.identifier; mox = t.clientX; moy = t.clientY;
-          if (stick) { stick.style.display = 'block'; stick.style.left = mox + 'px'; stick.style.top = moy + 'px'; }
+          // float the visible base to the thumb
+          if (stick) { stick.style.left = (mox - 69) + 'px'; stick.style.top = (moy - 69) + 'px'; }
           setStick(0, 0);
         } else if (!leftZone && lookId === null) {
           lookId = t.identifier; lpx = t.clientX; lpy = t.clientY;
@@ -380,6 +388,10 @@ export function createInput(canvas) {
     };
     root.addEventListener('touchend', endTouch, { passive: false });
     root.addEventListener('touchcancel', endTouch, { passive: false });
+
+    restStick(); // show the base at its resting spot from the start
+    window.addEventListener('resize', () => { if (moveId === null) restStick(); });
+    window.addEventListener('orientationchange', () => setTimeout(restStick, 100));
   };
 
   return input;

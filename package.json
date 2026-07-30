@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "peerjs": "^1.5.5",
     "three": "^0.185.1"
   },
   "devDependencies": {
