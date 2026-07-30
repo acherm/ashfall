@@ -171,10 +171,11 @@ export function createInput(canvas) {
       padKey('ControlLeft', b(11)); // R-stick click — crouch
       padKey('KeyV', b(4));         // L bumper — SIUU celebration
       padKey('KeyH', b(5));         // R bumper — horn (in a vehicle)
-      // D-pad — weapon select: up = primary, right = pistol, left = knife
+      // D-pad — weapon select: up = primary, right = pistol, left = knife, down = grenade
       padKey('Digit1', b(12));
       padKey('Digit2', b(15));
       padKey('Digit3', b(14));
+      padKey('KeyG', b(13));
     } else {
       padKey('Space', b(1));
       padKey('KeyR', b(3));
@@ -344,6 +345,7 @@ export function createInput(canvas) {
     bindHold('tjump', 'Space');
     bindHold('tcrouch', 'ControlLeft');
     bindTap('treload', 'KeyR');
+    bindTap('tnade', 'KeyG');
     bindTap('tinteract', 'KeyE');
     bindTap('tsprint', 'ShiftLeft'); // hold-ish; toggled via down while pressed
     bindHold('tsprint', 'ShiftLeft');

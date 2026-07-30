@@ -12,6 +12,7 @@ import { createFootballs } from './fx/footballs.js';
 import { createCars } from './vehicles/cars.js';
 import { createCivilians } from './world/civilians.js';
 import { createNetplay } from './net/netplay.js';
+import { createGrenades } from './fx/grenades.js';
 
 const params = new URLSearchParams(location.search);
 const SHOT = params.has('shot');
@@ -73,24 +74,52 @@ if (fb) {
   hud.setBallMode?.(true);
 }
 
+// area blast shared by the missile truck AND thrown grenades: kills enemies in
+// the radius; if `hurtPlayer`, also damages the player when they're too close
+function areaBlast(point, radius, hurtPlayer = false) {
+  const vols = enemies.hitVolumes ? enemies.hitVolumes() : [];
+  let kills = 0;
+  for (const v of vols) {
+    const dx = v.pos.x - point.x, dz = v.pos.z - point.z;
+    if (Math.hypot(dx, dz) < radius + (v.radius || 0.34)) {
+      if (enemies.runover?.(v.ref, 25)) kills++;
+    }
+  }
+  if (hurtPlayer && player.alive !== false) {
+    const d = Math.hypot(player.position.x - point.x, player.position.z - point.z);
+    if (d < radius + 0.5) {
+      const dmg = Math.round(70 * (1 - d / (radius + 0.5)));
+      if (dmg > 0) { player.takeDamage(dmg, point); player.addViewKick(0.05 * Math.random() - 0.025, 0.05 * Math.random() - 0.025); }
+    }
+  }
+  return kills;
+}
+
 // drivable cars — camera/controls take over while driving (player.update skipped)
 const cars = createCars({
   scene: R.scene, world, input, player, hud, audio, camera: R.camera, fx,
   getEnemyVolumes: () => (enemies.hitVolumes ? enemies.hitVolumes() : []),
   runover: (ref, speed) => enemies.runover?.(ref, speed),
-  // missile truck: area strike — kills every enemy inside the blast radius
-  missileStrike: (point, radius) => {
-    const vols = enemies.hitVolumes ? enemies.hitVolumes() : [];
-    let kills = 0;
-    for (const v of vols) {
-      const dx = v.pos.x - point.x, dz = v.pos.z - point.z;
-      if (Math.hypot(dx, dz) < radius + (v.radius || 0.34)) {
-        if (enemies.runover?.(v.ref, 25)) kills++;
-      }
-    }
-    return kills;
-  },
+  missileStrike: (point, radius) => areaBlast(point, radius, false),
 });
+
+// thrown grenades — G / touch NADE / gamepad; area blast that can hurt you too
+const grenades = createGrenades({ scene: R.scene, world, fx, audio });
+grenades.onExplode = (pos, radius) => {
+  const kills = areaBlast(pos, radius, true);
+  if (kills > 0) hud.killfeed?.(kills > 2 ? 'Grenade — multi kill!' : 'Grenade kill');
+};
+let nades = 4, nadeCd = 0;
+const _throwDir = new THREE.Vector3();
+function throwGrenade() {
+  if (nades <= 0 || nadeCd > 0 || cars.driving || player.alive === false) return;
+  nades--; nadeCd = 0.7;
+  hud.setGrenades?.(nades);
+  R.camera.getWorldDirection(_throwDir);
+  const eye = player.getEyePos();
+  eye.addScaledVector(_throwDir, 0.4);
+  grenades.throw(eye, _throwDir, 18);
+}
 
 // civilian pedestrians — pure ambience, never targets
 const civilians = createCivilians({
@@ -237,6 +266,7 @@ document.addEventListener('pointerlockchange', () => {
 hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : 'ELIMINATE HOSTILE FORCES');
 hud.setHealth(100);
 hud.setAmmo(30, 150);
+if (!FOOTBALL) hud.setGrenades?.(nades);
 
 if (params.has('dbg')) { window.__player = player; window.__enemies = enemies; window.__input = input; window.__net = net; window.__R = R; } // test hook
 
@@ -382,6 +412,10 @@ function tick(dt) {
 
     const driving = !!cars.driving;
     if (!driving) player.update(dt);
+    // grenades: throw on G (also fed by touch NADE + gamepad), then simulate
+    nadeCd = Math.max(0, nadeCd - dt);
+    if (!FOOTBALL && (input.pressed('KeyG') || input.pressed('KeyB'))) throwGrenade();
+    grenades.update(dt);
     cars.update(dt);
     if (weapon.viewmodel) {
       const wantVisible = !driving && !window.__overview;

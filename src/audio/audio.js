@@ -24,6 +24,7 @@ export function createAudio() {
       ricochet: noop, ambience: noop, bodyFall: noop, update: noop,
       pistolShot: noop, knifeSwing: noop, knifeStab: noop,
       kick: noop, kickAt: noop, bounce: noop,
+      grenadeThrow: noop, explosion: noop,
       engineStart: noop, engineStop: noop, engineRpm: noop,
       crash: noop, skid: noop, horn: noop,
     };
@@ -421,6 +422,27 @@ export function createAudio() {
     burst(sp, t0, { peak: 0.55 * g0, a: 0.002, d: 0.045, type: 'lowpass', f0: 420, Q: 0.8, rate: rnd(0.9, 1.1) });
   });
 
+  // grenade toss: short filtered pin/click + tiny whoosh
+  const grenadeThrow = guard(() => {
+    const t0 = now();
+    const sp = panNode(rnd(-0.15, 0.15)); sp.connect(sfx);
+    burst(sp, t0, { peak: 0.16, a: 0.001, d: 0.06, type: 'bandpass', f0: 1700, Q: 1.3, rate: 1 });
+  });
+
+  // explosion: big low boom — sub sine drop + broadband body + a sharp crack
+  const explosion = guard((pos) => {
+    const d = pos ? distTo(pos) : 6;
+    const g0 = Math.min(1, 12 / (3 + d));
+    if (g0 < 0.02) return;
+    const t0 = now();
+    const sp = panNode(pos ? panFor(pos) : 0); sp.connect(sfx);
+    tone(sp, t0, { type: 'sine', f0: 120, f1: 34, peak: 1.0 * g0, a: 0.004, d: 0.5 });
+    tone(sp, t0 + 0.01, { type: 'triangle', f0: 82, f1: 30, peak: 0.7 * g0, a: 0.004, d: 0.4 });
+    burst(sp, t0, { peak: 0.9 * g0, a: 0.003, d: 0.45, type: 'lowpass', f0: 900, Q: 0.6, rate: 1 });
+    burst(sp, t0, { peak: 0.7 * g0, a: 0.0005, d: 0.09, type: 'bandpass', f0: 2200, Q: 0.8, rate: 1 });
+    burst(sp, t0 + 0.08, { peak: 0.3 * g0, a: 0.01, d: 0.55, type: 'highpass', f0: 1200, Q: 0.5, rate: 1 });
+  });
+
   // ------------------------------------------------------------- CARS sfx
   // Engine loop: layered saw/square/sub through a lowpass, rpm-scaled pitch
   // (idle grumble -> higher whine). Nodes may be created while suspended —
@@ -687,6 +709,8 @@ export function createAudio() {
     kick,
     kickAt,
     bounce,
+    grenadeThrow,
+    explosion,
     engineStart,
     engineStop,
     engineRpm,

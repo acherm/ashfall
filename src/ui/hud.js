@@ -124,6 +124,14 @@ export function createHUD() {
   font-size: 10.5px; font-weight: 600; letter-spacing: 3.5px;
   color: rgba(255,255,255,0.5); margin-bottom: 5px;
 }
+.hf-nade {
+  position: absolute; right: 36px; bottom: 116px; text-align: right;
+  display: flex; align-items: baseline; gap: 9px; justify-content: flex-end;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.85);
+}
+.hf-nade-lab { font-size: 10px; font-weight: 600; letter-spacing: 3px; color: rgba(255,255,255,0.5); }
+.hf-nade-n { font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.9); min-width: 16px; }
+.hf-nade.empty .hf-nade-n { color: #c9564a; }
 .hf-ammo-rule {
   height: 1px; margin: 0 0 6px auto; width: 118px;
   background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.22));
@@ -470,6 +478,7 @@ export function createHUD() {
   </div>
   <div class="hf-ammo-mode">5.56 MM &mdash; AUTO</div>
 </div>
+<div class="hf-nade"><span class="hf-nade-lab">GRENADES&ensp;G</span><span class="hf-nade-n">4</span></div>
 <div class="hf-prompt"></div>
 <div class="hf-speed">
   <span class="hf-speed-num">0</span><span class="hf-speed-unit">KM/H</span>
@@ -503,6 +512,8 @@ export function createHUD() {
   const ammoNameEl = $('.hf-ammo-name');
   const ammoSepEl = $('.hf-ammo-sep');
   const ammoModeEl = $('.hf-ammo-mode');
+  const nadeEl = $('.hf-nade');
+  const nadeNEl = $('.hf-nade-n');
   const ch = $('.hf-ch');
   const hm = $('.hf-hm');
   const sbEl = $('.hf-sb');
@@ -563,6 +574,15 @@ export function createHUD() {
     void hm.offsetWidth; // restart CSS animation
     if (isKill) hm.classList.add('kill');
     hm.classList.add('show');
+    wake();
+  }
+
+  function setGrenades(n) {
+    if (!nadeNEl) return;
+    n = Math.max(0, n | 0);
+    nadeNEl.textContent = String(n);
+    nadeEl.classList.toggle('empty', n === 0);
+    if (ballMode && nadeEl) nadeEl.style.display = 'none'; // no grenades in CR7 mode
     wake();
   }
 
@@ -846,6 +866,7 @@ export function createHUD() {
     setSprint,
     hitmarker,
     setAmmo,
+    setGrenades,
     setWeaponName,
     setMelee,
     setBallMode,
