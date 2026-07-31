@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import { createRenderer } from './core/renderer.js';
 import { createInput } from './core/input.js';
 import { createPlayer } from './core/player.js';
-import { createWorld } from './world/map.js';
+import { createWorld as createCityWorld } from './world/map.js';
+import { createWorld as createGandyWorld } from './world/mapGandy.js';
+import { createWorld as createVelodromeWorld } from './world/mapVelodrome.js';
 import { createFX } from './fx/particles.js';
 import { createWeapon } from './weapons/weapon.js';
 import { createEnemyManager } from './enemies/enemies.js';
@@ -31,6 +33,10 @@ const input = createInput(canvas);
 const IS_TOUCH = (window.matchMedia && matchMedia('(pointer: coarse)').matches)
   || 'ontouchstart' in window || (navigator.maxTouchPoints || 0) > 0;
 input.initTouch?.();
+// selectable decor: ?map=gandy | velodrome | (default) city
+const MAP = params.get('map');
+const createWorld = MAP === 'gandy' ? createGandyWorld
+  : MAP === 'velodrome' ? createVelodromeWorld : createCityWorld;
 const world = createWorld(R.scene);
 const fx = createFX({ scene: R.scene, camera: R.camera });
 const hud = createHUD();
@@ -220,6 +226,21 @@ if (diffSel) {
     highlight();
   }));
   highlight();
+}
+
+// decor (map) picker: reload with ?map=X, preserving difficulty
+const mapSel = document.getElementById('mapSel');
+if (mapSel) {
+  mapSel.querySelectorAll('.chip').forEach((c) => {
+    if ((c.dataset.map || '') === (MAP || '')) c.classList.add('sel');
+    c.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const q = [];
+      if (c.dataset.map) q.push('map=' + c.dataset.map);
+      if (startLevel > 1) q.push('level=' + startLevel);
+      location.search = q.length ? '?' + q.join('&') : '?';
+    });
+  });
 }
 
 // co-op menu: Host shows a room code, Join connects with one

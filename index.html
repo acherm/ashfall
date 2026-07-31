@@ -3,7 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>ASHFALL</title>
+<title>CallOfAcher</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<meta name="theme-color" content="#0a0d10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CallOfAcher">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #0a0c0e;
                touch-action: none; -webkit-user-select: none; user-select: none;
@@ -60,7 +68,7 @@
           font-family: "Helvetica Neue", Arial, sans-serif; color: #e8e6e1;
           transition: opacity 0.5s ease; }
   #menu.hidden { opacity: 0; pointer-events: none; }
-  #menu h1 { font-size: 64px; font-weight: 200; letter-spacing: 26px; margin: 0 0 6px 26px;
+  #menu h1 { font-size: 56px; font-weight: 200; letter-spacing: 13px; margin: 0 0 6px 13px;
              text-shadow: 0 2px 24px rgba(255,190,110,0.25); }
   #menu .sub { font-size: 12px; letter-spacing: 8px; margin-left: 8px; color: #9aa3ad;
                text-transform: uppercase; }
@@ -162,14 +170,20 @@
   <div class="row2">Duck behind the dumpsters on the pavements to break line of sight</div>
 </div>
 <div id="menu">
-  <h1>ASHFALL</h1>
-  <div class="sub">Sector 9 &mdash; Urban Combat Operations</div>
-  <div class="difflabel">Starting difficulty</div>
+  <h1>CALLOFACHER</h1>
+  <div class="sub">Secteur 9 &mdash; Op&eacute;rations de combat urbain</div>
+  <div class="difflabel">D&eacute;cor</div>
+  <div class="diff" id="mapSel">
+    <div class="chip" data-map="">Ville</div>
+    <div class="chip" data-map="gandy">Vall&eacute;e de Gandy</div>
+    <div class="chip" data-map="velodrome">V&eacute;lodrome</div>
+  </div>
+  <div class="difflabel">Difficult&eacute; de d&eacute;part</div>
   <div class="diff" id="diffSel">
-    <div class="chip" data-level="1">Recruit</div>
-    <div class="chip" data-level="2">Regular</div>
-    <div class="chip" data-level="3">Hardened</div>
-    <div class="chip" data-level="4">Veteran</div>
+    <div class="chip" data-level="1">Recrue</div>
+    <div class="chip" data-level="2">R&eacute;gulier</div>
+    <div class="chip" data-level="3">Aguerri</div>
+    <div class="chip" data-level="4">V&eacute;t&eacute;ran</div>
   </div>
   <div class="start">Click to deploy</div>
   <div class="keys">WASD move &nbsp;&middot;&nbsp; Shift sprint &nbsp;&middot;&nbsp; RMB aim &nbsp;&middot;&nbsp; LMB fire &nbsp;&middot;&nbsp; R reload &nbsp;&middot;&nbsp; Ctrl crouch &nbsp;&middot;&nbsp; 1/2/3 weapon</div>
