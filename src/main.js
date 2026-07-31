@@ -5,6 +5,7 @@ import { createPlayer } from './core/player.js';
 import { createWorld as createCityWorld } from './world/map.js';
 import { createWorld as createGandyWorld } from './world/mapGandy.js';
 import { createWorld as createVelodromeWorld } from './world/mapVelodrome.js';
+import { createWorld as createStAubinWorld } from './world/mapStAubin.js';
 import { createFX } from './fx/particles.js';
 import { createWeapon } from './weapons/weapon.js';
 import { createEnemyManager } from './enemies/enemies.js';
@@ -36,7 +37,8 @@ input.initTouch?.();
 // selectable decor: ?map=gandy | velodrome | (default) city
 const MAP = params.get('map');
 const createWorld = MAP === 'gandy' ? createGandyWorld
-  : MAP === 'velodrome' ? createVelodromeWorld : createCityWorld;
+  : MAP === 'velodrome' ? createVelodromeWorld
+  : MAP === 'staubin' ? createStAubinWorld : createCityWorld;
 const world = createWorld(R.scene);
 const fx = createFX({ scene: R.scene, camera: R.camera });
 const hud = createHUD();
