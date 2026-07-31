@@ -111,6 +111,7 @@ grenades.onExplode = (pos, radius) => {
 };
 let nades = 4, nadeCd = 0;
 const _throwDir = new THREE.Vector3();
+const _fwd = new THREE.Vector3(); // reused for touch aim-assist
 function throwGrenade() {
   if (nades <= 0 || nadeCd > 0 || cars.driving || player.alive === false) return;
   nades--; nadeCd = 0.7;
@@ -280,7 +281,7 @@ const hintEl = document.getElementById('hint');
 let hintTimer = 0;
 if (IS_TOUCH && hintEl) {
   const r2 = hintEl.querySelector('.row2');
-  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick &mdash; up = forward (push fully to sprint) &nbsp;&middot;&nbsp; swipe the <b>RIGHT side</b> to look &amp; turn &nbsp;&middot;&nbsp; corner buttons fire / aim / jump';
+  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick (push fully to sprint) &nbsp;&middot;&nbsp; swipe the <b>RIGHT side</b> to turn &nbsp;&middot;&nbsp; hold <b>AIM</b> on a foe to auto-fire &nbsp;&middot;&nbsp; <b>+</b> for grenade / weapons';
 }
 function showHint() {
   if (!hintEl) return;
@@ -442,6 +443,22 @@ function tick(dt) {
 
     const driving = !!cars.driving;
     if (!driving) player.update(dt);
+    // touch aim-assist: hold AIM with an enemy near the reticle → auto-fire, so
+    // mobile players don't have to aim pixel-perfect (only while aiming, so the
+    // manual FIRE button still works normally otherwise)
+    if (IS_TOUCH && !FOOTBALL && !driving && player.alive !== false && input.aimHeld) {
+      R.camera.getWorldDirection(_fwd);
+      const eye = player.getEyePos();
+      let onTarget = false;
+      const vols = enemies.hitVolumes ? enemies.hitVolumes() : [];
+      for (const v of vols) {
+        const dx = v.pos.x - eye.x, dy = (v.pos.y + 0.9) - eye.y, dz = v.pos.z - eye.z;
+        const dist = Math.hypot(dx, dy, dz);
+        if (dist > 70 || dist < 1) continue;
+        if ((dx * _fwd.x + dy * _fwd.y + dz * _fwd.z) / dist > 0.9991) { onTarget = true; break; } // ~2.4° cone
+      }
+      input.fireHeld = onTarget;
+    }
     // grenades: throw on G (also fed by touch NADE + gamepad), then simulate
     nadeCd = Math.max(0, nadeCd - dt);
     if (!FOOTBALL && (input.pressed('KeyG') || input.pressed('KeyB'))) throwGrenade();

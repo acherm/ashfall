@@ -353,6 +353,13 @@ export function createInput(canvas) {
     bindTap('tnade', 'KeyG');
     bindTap('tinteract', 'KeyE');
     // sprint is automatic (push the move stick fully forward) — no RUN button
+    // "+" reveals/hides the secondary buttons (reload, grenade, interact, weapons)
+    const moreBtn = document.getElementById('tmore');
+    if (moreBtn) moreBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      const on = root.classList.toggle('showmore');
+      moreBtn.textContent = on ? '×' : '+';
+    }, { passive: false });
     bindTap('tw1', 'Digit1');
     bindTap('tw2', 'Digit2');
     bindTap('tw3', 'Digit3');
