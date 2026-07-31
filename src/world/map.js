@@ -2078,6 +2078,16 @@ export function createWorld(scene) {
   squishBin(-9.62, 37, 1); squishBin(-9.66, 37.9, 2);           // west cluster near spawn
   squishBin(-22.3, -52.8, 2); squishBin(-21.55, -53.15, 0);     // SW cluster by the alley dumpster
   squishBin(-24, 27.5, 1); squishWheelie(-23.4, 28.15, 0.5, 0); // plaza SE corner
+  // FREE-STANDING curb-line dumpsters in the play area — proper "duck behind it"
+  // cover, spaced down both curbs and clearly visible from spawn (kept clear of
+  // the driving lane centre and the parked-vehicle spots)
+  squishDumpster(6.9, 46, HPI, 1);      // right curb, right ahead of spawn
+  squishDumpster(-6.9, 14, -HPI, 0);    // left curb, mid-street
+  squishDumpster(6.9, 8, HPI, 2);       // right curb
+  squishDumpster(-6.9, -2, -HPI, 1);    // left curb
+  squishDumpster(6.9, -14, HPI, 0);     // right curb, lower street
+  squishDumpster(-6.9, -38, -HPI, 2);   // left curb, far
+  coverPoints.push(V3(5.7, 0, 46), V3(-5.7, 0, 14), V3(5.7, 0, 8), V3(-5.7, 0, -2), V3(5.7, 0, -14));
 
   // enemy AI also uses the dumpsters/bins as cover (street-side stand points)
   coverPoints.push(
