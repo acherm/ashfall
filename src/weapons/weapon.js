@@ -50,7 +50,7 @@ const KNIFE_RANGE = 2.4;                 // m, melee reach
 // loadout is unchanged until the player picks something up).
 const WEAPON_DEFS = {
   mk4: {
-    name: 'MK4 CARBINE', hudMode: '5.56 MM — AUTO',
+    name: 'CARABINE MK4', hudMode: '5.56 MM — AUTO',
     auto: true, rpm: 720, dmg: 26,
     spreadHip: 1.4, spreadAds: 0.12,
     bloomAdd: 0.35, bloomMax: 1.6, bloomDecay: 4.5,
@@ -87,7 +87,7 @@ const WEAPON_DEFS = {
   // ---- SLOT 2: sidearm. SEMI-AUTO (one round per click), light recoil, tight
   // cone, fast iron-sight ADS. Reserve auto-refills on equip — it's a fallback.
   pistol: {
-    name: 'M9 SIDEARM', hudMode: '9 MM — SEMI',
+    name: 'PISTOLET M9', hudMode: '9 MM — SEMI',
     kind: 'pistol', auto: false, rpm: 360, dmg: 34,
     spreadHip: 2.2, spreadAds: 0.4,
     bloomAdd: 0.5, bloomMax: 2.0, bloomDecay: 6.0,
@@ -99,7 +99,7 @@ const WEAPON_DEFS = {
   },
   // ---- SLOT 3: melee. No ammo, no ADS, no muzzle fx — a slash + short ray.
   knife: {
-    name: 'COMBAT KNIFE', hudMode: 'MELEE',
+    name: 'COUTEAU DE COMBAT', hudMode: 'MÊLÉE',
     kind: 'knife', melee: true, dmg: 140, rpm: 120,
     spreadHip: 3.0, spreadAds: 3.0, bloomDecay: 5.0,
   },
@@ -1759,7 +1759,7 @@ export function createWeapon({
       }
     }
     if (nearDrop) {
-      const label = 'Y — PICK UP ' + WEAPON_DEFS[nearDrop.type].name;
+      const label = 'Y — RAMASSER ' + WEAPON_DEFS[nearDrop.type].name;
       if (!promptShown || promptLabel !== label) {
         promptShown = true; promptLabel = label;
         hud.setPrompt?.(label);

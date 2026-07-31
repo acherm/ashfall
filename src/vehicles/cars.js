@@ -1132,7 +1132,7 @@ export function createCars({ scene, world, input, player, hud, audio, camera, ge
     { kind: 'race', name: 'SUPERBIKE', hex: 0x46586a, seed: 8405, x: -6.1, z: 36.0, heading: Math.PI - 0.06 },
     // missile war truck — parked angled at the lower end of the main street,
     // clear of the F1 (~-0.3,-8) and the burgundy sedan (4.75,-28)
-    { kind: 'truck', name: 'MISSILE TRUCK', hex: 0x474c36, seed: 9007, x: 0.5, z: -38.0, heading: 0.3 },
+    { kind: 'truck', name: 'CAMION MISSILE', hex: 0x474c36, seed: 9007, x: 0.5, z: -38.0, heading: 0.3 },
   ];
 
   const NUDGES = [
@@ -1547,7 +1547,7 @@ export function createCars({ scene, world, input, player, hud, audio, camera, ge
     const kills = missileStrike ? (missileStrike(p, MSL_RADIUS) | 0) : 0;
     mslLastKills = kills;
     mslLastImpact = [+p.x.toFixed(2), +p.y.toFixed(2), +p.z.toFixed(2)];
-    if (kills > 0) hud.killfeed?.(`MISSILE STRIKE — ${kills} down`);
+    if (kills > 0) hud.killfeed?.(`FRAPPE MISSILE — ${kills} abattus`);
     m.g.visible = false;
     mslPool.push(m);
   }
@@ -1801,7 +1801,7 @@ export function createCars({ scene, world, input, player, hud, audio, camera, ge
       }
       if (best) {
         // exotics carry their real-model name; the old fleet keeps the plain prompt
-        const verb = best.P.bike ? 'E — RIDE' : 'E — DRIVE';
+        const verb = best.P.bike ? 'E — PILOTER' : 'E — CONDUIRE';
         const txt = best.name ? `${verb} · ${best.name}` : verb;
         if (!promptOn || promptTxt !== txt) { hud.setPrompt?.(txt); promptOn = true; promptTxt = txt; }
         if (eP) enterCar(best);

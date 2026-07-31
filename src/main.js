@@ -113,7 +113,7 @@ const cars = createCars({
 const grenades = createGrenades({ scene: R.scene, world, fx, audio });
 grenades.onExplode = (pos, radius) => {
   const kills = areaBlast(pos, radius, true);
-  if (kills > 0) hud.killfeed?.(kills > 2 ? 'Grenade — multi kill!' : 'Grenade kill');
+  if (kills > 0) hud.killfeed?.(kills > 2 ? 'Grenade — multi-kill !' : 'Grenade — abattu');
 };
 let nades = 4, nadeCd = 0;
 const _throwDir = new THREE.Vector3();
@@ -196,9 +196,9 @@ function showVictory() {
   if (victoryStats) {
     const secs = Math.round(runTime);
     victoryStats.innerHTML =
-      `Hostiles eliminated: <b>${enemies.kills | 0}</b><br>`
-      + `Reached: <b>Level ${enemies.level | 0} · ${enemies.difficultyName || ''}</b><br>`
-      + `Time: <b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b>`;
+      `Hostiles éliminés : <b>${enemies.kills | 0}</b><br>`
+      + `Atteint : <b>Niveau ${enemies.level | 0} · ${enemies.difficultyName || ''}</b><br>`
+      + `Temps : <b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b>`;
   }
   victoryEl?.classList.add('show');
 }
@@ -210,7 +210,7 @@ document.getElementById('victoryReplay')?.addEventListener('click', () => {
 });
 document.getElementById('victoryContinue')?.addEventListener('click', () => {
   victoryEl?.classList.remove('show');
-  hud.setObjective('ENDLESS — HOLD THE SECTOR');
+  hud.setObjective('SANS FIN — TENEZ LE SECTEUR');
   if (!IS_TOUCH) input.requestLock();
 });
 
@@ -250,23 +250,23 @@ const coopCode = document.getElementById('coopCode');
 const coopStatus = document.getElementById('coopStatus');
 function setCoop(text, cls) { if (coopStatus) { coopStatus.textContent = text; coopStatus.className = cls || ''; } }
 net.onStatus?.((s, info) => {
-  if (s === 'hosting') setCoop('Share this code: ' + info, 'warn');
-  else if (s === 'connecting') setCoop('Connecting…', 'warn');
-  else if (s === 'connected') setCoop('Teammate connected — deploy!', 'ok');
-  else if (s === 'error') setCoop(info || 'Connection failed', 'err');
-  else if (s === 'closed') setCoop('Teammate disconnected', 'err');
+  if (s === 'hosting') setCoop('Partagez ce code : ' + info, 'warn');
+  else if (s === 'connecting') setCoop('Connexion…', 'warn');
+  else if (s === 'connected') setCoop('Coéquipier connecté — déploiement !', 'ok');
+  else if (s === 'error') setCoop(info || 'Échec de la connexion', 'err');
+  else if (s === 'closed') setCoop('Coéquipier déconnecté', 'err');
 });
 coopHost?.addEventListener('click', (e) => {
   e.stopPropagation();
-  setCoop('Creating room…', 'warn');
-  net.host().then((code) => setCoop('Share this code: ' + code, 'warn')).catch(() => setCoop('Could not host', 'err'));
+  setCoop('Création du salon…', 'warn');
+  net.host().then((code) => setCoop('Partagez ce code : ' + code, 'warn')).catch(() => setCoop('Hébergement impossible', 'err'));
 });
 coopJoin?.addEventListener('click', (e) => {
   e.stopPropagation();
   const c = (coopCode?.value || '').trim();
-  if (c.length < 4) { setCoop('Enter the 4-character code', 'err'); return; }
-  setCoop('Joining…', 'warn');
-  net.join(c).then(() => setCoop('Connected — deploy!', 'ok')).catch(() => setCoop('Join failed — check the code', 'err'));
+  if (c.length < 4) { setCoop('Saisissez le code à 4 caractères', 'err'); return; }
+  setCoop('Connexion…', 'warn');
+  net.join(c).then(() => setCoop('Connecté — déploiement !', 'ok')).catch(() => setCoop('Échec — vérifiez le code', 'err'));
 });
 
 // mode toggle button: full reload so every module rebuilds for the other mode
@@ -302,7 +302,7 @@ const hintEl = document.getElementById('hint');
 let hintTimer = 0;
 if (IS_TOUCH && hintEl) {
   const r2 = hintEl.querySelector('.row2');
-  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick (push fully to sprint) &nbsp;&middot;&nbsp; swipe the <b>RIGHT side</b> to turn &nbsp;&middot;&nbsp; hold <b>AIM</b> on a foe to auto-fire &nbsp;&middot;&nbsp; <b>+</b> for grenade / weapons';
+  if (r2) r2.innerHTML = 'Joystick <b>DÉPLACER</b> à gauche (poussez à fond pour sprinter) &nbsp;&middot;&nbsp; glissez sur la <b>MOITIÉ DROITE</b> pour pivoter &nbsp;&middot;&nbsp; maintenez <b>VISER</b> sur un ennemi pour tir auto &nbsp;&middot;&nbsp; <b>+</b> pour grenade / armes';
 }
 function showHint() {
   if (!hintEl) return;
@@ -315,7 +315,7 @@ document.addEventListener('pointerlockchange', () => {
   else menu.classList.add('hidden');
 });
 
-hud.setObjective(FOOTBALL ? 'SCORE GOALS ON THE RONALDOS' : ('ELIMINATE ' + WIN_KILLS + ' HOSTILES'));
+hud.setObjective(FOOTBALL ? 'MARQUEZ CONTRE LES RONALDO' : ('ÉLIMINEZ ' + WIN_KILLS + ' HOSTILES'));
 hud.setHealth(100);
 hud.setAmmo(30, 150);
 if (!FOOTBALL) hud.setGrenades?.(nades);
@@ -526,8 +526,8 @@ function tick(dt) {
         deathShown = true;
         const ln = enemies.level | 0;
         if (deathSub) deathSub.textContent = ln > 1
-          ? `Fell at Level ${ln} · ${enemies.difficultyName || ''}`.trim()
-          : 'You were eliminated';
+          ? `Tombé au Niveau ${ln} · ${enemies.difficultyName || ''}`.trim()
+          : 'Vous avez été éliminé';
         deathEl?.classList.add('show');
       }
       if (dead && input.menuPressed?.()) redeploy(); // gamepad A / Start

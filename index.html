@@ -114,8 +114,8 @@
            font-family: "Helvetica Neue", Arial, sans-serif; color: #d8cfca;
            opacity: 0; transition: opacity 0.7s ease; }
   #death.show { display: flex; opacity: 1; }
-  #death h1 { font-size: 58px; font-weight: 200; letter-spacing: 20px; margin: 0 0 6px 20px;
-              color: #b64a3e; text-shadow: 0 2px 30px rgba(200,50,40,0.35); }
+  #death h1 { font-size: 46px; font-weight: 200; letter-spacing: 13px; margin: 0 0 6px 13px;
+              white-space: nowrap; color: #b64a3e; text-shadow: 0 2px 30px rgba(200,50,40,0.35); }
   #death .dsub { font-size: 12px; letter-spacing: 7px; color: #8a8078; text-transform: uppercase; }
   #death .redeploy { margin-top: 52px; font-size: 14px; letter-spacing: 5px; color: #dfe4e8;
               border: 1px solid rgba(220,225,230,0.4); padding: 13px 40px; text-transform: uppercase;
@@ -151,14 +151,14 @@
 <div id="hud"></div>
 <div id="touch">
   <div id="tstick"><div id="tknob"></div></div>
-  <div id="tfire" class="tbtn big">FIRE</div>
-  <div id="taim" class="tbtn">AIM</div>
-  <div id="tjump" class="tbtn">JUMP</div>
-  <div id="tcrouch" class="tbtn">DUCK</div>
+  <div id="tfire" class="tbtn big">FEU</div>
+  <div id="taim" class="tbtn">VISER</div>
+  <div id="tjump" class="tbtn">SAUT</div>
+  <div id="tcrouch" class="tbtn">ACCR.</div>
   <div id="tmore" class="tbtn sm">+</div>
   <div id="tsecondary">
     <div id="treload" class="tbtn">R</div>
-    <div id="tnade" class="tbtn">NADE</div>
+    <div id="tnade" class="tbtn">GREN.</div>
     <div id="tinteract" class="tbtn">E</div>
     <div id="tw1" class="tbtn sm">1</div>
     <div id="tw2" class="tbtn sm">2</div>
@@ -166,8 +166,8 @@
   </div>
 </div>
 <div id="hint">
-  <div class="row1"><b>1</b> Rifle &nbsp;&middot;&nbsp; <b>2</b> Pistol &nbsp;&middot;&nbsp; <b>3</b> Knife</div>
-  <div class="row2">Duck behind the dumpsters on the pavements to break line of sight</div>
+  <div class="row1"><b>1</b> Fusil &nbsp;&middot;&nbsp; <b>2</b> Pistolet &nbsp;&middot;&nbsp; <b>3</b> Couteau</div>
+  <div class="row2">Accroupissez-vous derri&egrave;re les bennes sur les trottoirs pour briser la ligne de vue</div>
 </div>
 <div id="menu">
   <h1>CALLOFACHER</h1>
@@ -185,30 +185,30 @@
     <div class="chip" data-level="3">Aguerri</div>
     <div class="chip" data-level="4">V&eacute;t&eacute;ran</div>
   </div>
-  <div class="start">Click to deploy</div>
-  <div class="keys">WASD move &nbsp;&middot;&nbsp; Shift sprint &nbsp;&middot;&nbsp; RMB aim &nbsp;&middot;&nbsp; LMB fire &nbsp;&middot;&nbsp; R reload &nbsp;&middot;&nbsp; Ctrl crouch &nbsp;&middot;&nbsp; 1/2/3 weapon</div>
-  <div class="difflabel">Co-op (2 players)</div>
+  <div class="start">Cliquez pour d&eacute;ployer</div>
+  <div class="keys">ZQSD d&eacute;placer &nbsp;&middot;&nbsp; Maj sprint &nbsp;&middot;&nbsp; Clic droit viser &nbsp;&middot;&nbsp; Clic gauche feu &nbsp;&middot;&nbsp; R recharger &nbsp;&middot;&nbsp; Ctrl accroupir &nbsp;&middot;&nbsp; 1/2/3 arme</div>
+  <div class="difflabel">Coop (2 joueurs)</div>
   <div class="coop" id="coopBox" onclick="event.stopPropagation()">
-    <div class="chip" id="coopHost">Host game</div>
-    <div class="chip" id="coopJoin">Join</div>
+    <div class="chip" id="coopHost">H&eacute;berger</div>
+    <div class="chip" id="coopJoin">Rejoindre</div>
     <input id="coopCode" maxlength="4" placeholder="CODE" />
     <div id="coopStatus"></div>
   </div>
   <div id="modeToggle" class="mode"></div>
 </div>
 <div id="death">
-  <h1>K.I.A.</h1>
-  <div class="dsub" id="deathSub">You were eliminated</div>
-  <div class="redeploy">Redeploy</div>
-  <div class="dhint">Click &nbsp;&middot;&nbsp; or press R / Enter &nbsp;&middot;&nbsp; (gamepad: A / Start)</div>
+  <h1>MORT AU COMBAT</h1>
+  <div class="dsub" id="deathSub">Vous avez &eacute;t&eacute; &eacute;limin&eacute;</div>
+  <div class="redeploy">Red&eacute;ployer</div>
+  <div class="dhint">Cliquez &nbsp;&middot;&nbsp; ou appuyez sur R / Entr&eacute;e &nbsp;&middot;&nbsp; (manette : A / Start)</div>
 </div>
 <div id="victory">
-  <h1>MISSION COMPLETE</h1>
-  <div class="vsub">Sector 9 secured</div>
+  <h1>MISSION ACCOMPLIE</h1>
+  <div class="vsub">Secteur 9 s&eacute;curis&eacute;</div>
   <div class="vstats" id="victoryStats"></div>
   <div class="vbtns">
-    <div class="vbtn" id="victoryContinue">Keep fighting</div>
-    <div class="vbtn primary" id="victoryReplay">Play again</div>
+    <div class="vbtn" id="victoryContinue">Continuer le combat</div>
+    <div class="vbtn primary" id="victoryReplay">Rejouer</div>
   </div>
 </div>
 <script type="module" src="/src/main.js"></script>

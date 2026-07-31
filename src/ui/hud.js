@@ -388,7 +388,7 @@ export function createHUD() {
   document.head.appendChild(style);
 
   // ------------------------------------------------------------------ markup
-  const CARDINALS = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 180: 'S', 225: 'SW', 270: 'W', 315: 'NW' };
+  const CARDINALS = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 180: 'S', 225: 'SO', 270: 'O', 315: 'NO' };
 
   function buildStrip() {
     let html = '';
@@ -447,29 +447,29 @@ export function createHUD() {
 <div class="hf-obj hf-fade">
   <div class="hf-obj-bar"></div>
   <div>
-    <div class="hf-obj-line">STAND BY</div>
-    <div class="hf-obj-score">HOSTILES NEUTRALIZED&ensp;00</div>
+    <div class="hf-obj-line">EN ATTENTE</div>
+    <div class="hf-obj-score">HOSTILES ÉLIMINÉS&ensp;00</div>
   </div>
 </div>
 <div class="hf-lvl">
-  <span class="hf-lvl-tag">LEVEL 1</span>
+  <span class="hf-lvl-tag">NIVEAU 1</span>
   <span class="hf-lvl-dot"></span>
-  <span class="hf-lvl-name">RECRUIT</span>
+  <span class="hf-lvl-name">RECRUE</span>
 </div>
 <div class="hf-lvlb">
-  <div class="hf-lvlb-big">LEVEL 1</div>
-  <div class="hf-lvlb-sub">RECRUIT</div>
+  <div class="hf-lvlb-big">NIVEAU 1</div>
+  <div class="hf-lvlb-sub">RECRUE</div>
 </div>
 <div class="hf-kf"></div>
 <div class="hf-hp">
   <div class="hf-hp-num">100</div>
   <div>
-    <div class="hf-hp-lab">INTEGRITY</div>
+    <div class="hf-hp-lab">INTÉGRITÉ</div>
     <div class="hf-hp-bar">${segsHTML}</div>
   </div>
 </div>
 <div class="hf-ammo">
-  <div class="hf-ammo-name">MK4 CARBINE</div>
+  <div class="hf-ammo-name">CARABINE MK4</div>
   <div class="hf-ammo-rule"></div>
   <div class="hf-ammo-row">
     <div class="hf-ammo-mag">30</div>
@@ -545,7 +545,7 @@ export function createHUD() {
   let isIdle = false;
   let ballMode = false;
   let meleeMode = false;                // ARSENAL: knife equipped → ammo = "—"
-  let wpnName = 'MK4 CARBINE';          // ARSENAL: current weapon block text
+  let wpnName = 'CARABINE MK4';          // ARSENAL: current weapon block text
   let wpnMode = '5.56 MM — AUTO';
   let sbYou = null;   // null until setScoreboard first called (panel hidden)
   let sbCr7 = null;
@@ -738,7 +738,7 @@ export function createHUD() {
   }
 
   function setScore(k) {
-    objScore.innerHTML = 'HOSTILES NEUTRALIZED&ensp;' + String(Math.max(0, k | 0)).padStart(2, '0');
+    objScore.innerHTML = 'HOSTILES ÉLIMINÉS&ensp;' + String(Math.max(0, k | 0)).padStart(2, '0');
     wake();
   }
 
@@ -750,7 +750,7 @@ export function createHUD() {
   // objective, e.g. "LEVEL 3 · HARDENED". Hidden until the first call.
   function setLevel(n, name) {
     n = Math.max(1, n | 0);
-    lvlTagEl.textContent = 'LEVEL ' + n;
+    lvlTagEl.textContent = 'NIVEAU ' + n;
     lvlNameEl.textContent = String(name || '');
     if (!lvlEl.classList.contains('on')) lvlEl.classList.add('on');
     wake();
@@ -760,7 +760,7 @@ export function createHUD() {
   // fades in/out with a subtle scale pop over ~2.2s. Restarts if re-triggered.
   function levelBanner(n, name) {
     n = Math.max(1, n | 0);
-    lvlbBigEl.textContent = 'LEVEL ' + n;
+    lvlbBigEl.textContent = 'NIVEAU ' + n;
     lvlbSubEl.textContent = String(name || '');
     lvlbEl.classList.remove('show');
     void lvlbEl.offsetWidth; // restart CSS animation

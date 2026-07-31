@@ -347,7 +347,7 @@ function wrapAngle(a) {
  * scaling applies to the Ronaldos too. */
 
 const MAX_LEVEL = 12;
-const DIFF_NAMES = ['RECRUIT', 'REGULAR', 'HARDENED', 'VETERAN', 'ELITE', 'BRUTAL', 'SAVAGE', 'NIGHTMARE'];
+const DIFF_NAMES = ['RECRUE', 'RÉGULIER', 'AGUERRI', 'VÉTÉRAN', 'ÉLITE', 'BRUTAL', 'SAUVAGE', 'CAUCHEMAR'];
 function diffName(l) { return DIFF_NAMES[clamp((l | 0) - 1, 0, DIFF_NAMES.length - 1)]; }
 
 // memoized per-level multiplier bundle — a pure fn of the level, cached so no
@@ -921,14 +921,14 @@ export function createEnemyManager({ scene, world, fx, audio, hud, player }) {
   }
 
   const KILL_LINES = [
-    'Hostile down', 'Target neutralized', 'Enemy KIA',
-    'Hostile eliminated', 'Contact dropped', 'Tango down',
+    'Hostile abattu', 'Cible neutralisée', 'Ennemi éliminé',
+    'Hostile éliminé', 'Contact abattu', 'Tango abattu',
   ];
   const FB_LINES = [
-    'SIUUU!', 'GOOOAL!', 'CR7 down!', 'Hat-trick incoming!', 'CR7 down — SIUUU!',
+    'SIUUU!', 'GOOOAL!', 'CR7 au sol !', 'Triplé en approche !', 'CR7 au sol — SIUUU !',
   ];
-  const RUNOVER_LINES = ['Roadkill!', 'Écrasé!', 'Hit and run!'];
-  const RUNOVER_FB_LINES = ['Roadkill!', 'Écrasé!', 'Hit and run!', 'CR7 écrasé — SIUU?'];
+  const RUNOVER_LINES = ['Renversé !', 'Écrasé !', 'Délit de fuite !'];
+  const RUNOVER_FB_LINES = ['Renversé !', 'Écrasé !', 'Délit de fuite !', 'CR7 écrasé — SIUU?'];
 
   /* ------------------------------------------------------------ spawning */
 
@@ -1120,7 +1120,7 @@ export function createEnemyManager({ scene, world, fx, audio, hud, player }) {
     buildSpawnOrder();
     const burst = Math.min(toSpawn, 5); // rest trickles in fast (no hitch)
     for (let i = 0; i < burst; i++) trySpawnOne();
-    if (waveNum > 1) hud.killfeed('Wave ' + waveNum + ' inbound');
+    if (waveNum > 1) hud.killfeed('Vague ' + waveNum + ' en approche');
   }
 
   function spawnAt(pos, yaw) {
@@ -2195,7 +2195,7 @@ export function createEnemyManager({ scene, world, fx, audio, hud, player }) {
       hud.killfeed(FOOTBALL
         ? FB_LINES[(Math.random() * FB_LINES.length) | 0]
         : headshot
-          ? 'Headshot — hostile down'
+          ? 'Tir à la tête — hostile abattu'
           : KILL_LINES[(Math.random() * KILL_LINES.length) | 0]);
       return { killed: true, headshot };
     }
