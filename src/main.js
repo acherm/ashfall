@@ -137,9 +137,12 @@ const civilians = createCivilians({
 // online co-op (stage 1): peer-to-peer, renders a blue teammate avatar
 const net = createNetplay({ scene: R.scene });
 let netSendT = 0, remoteFirePrev = false;
+let lastJoinCode = null;          // remembered so a décor-realign reload can auto-reconnect
 const _rdir = new THREE.Vector3();
 net.onData?.((msg) => {
-  if (!msg || msg.t !== 'p') return;
+  if (!msg) return;
+  if (msg.t === 'w') { onWorldConfig(msg); return; }   // host → joiner: which décor/mode to load
+  if (msg.t !== 'p') return;
   net.applyRemote(msg);
   if (msg.fire && !remoteFirePrev) {
     const mz = net.remoteMuzzle();
@@ -151,6 +154,29 @@ net.onData?.((msg) => {
   }
   remoteFirePrev = !!msg.fire;
 });
+
+// co-op décor sync: each client bakes its world at page load from ?map=, so when a
+// joiner's décor/mode differs from the host's, reload the joiner onto the host's
+// map (carrying the code so it auto-reconnects). The host broadcasts on connect.
+function sendWorldConfig() {
+  const cfg = { t: 'w', map: MAP || '', level: startLevel, football: FOOTBALL ? 1 : 0 };
+  net.send(cfg);
+  setTimeout(() => net.send(cfg), 400);    // resend to beat the data-channel open race
+  setTimeout(() => net.send(cfg), 1000);
+}
+function onWorldConfig(cfg) {
+  if (net.isHost || !cfg) return;          // only joiners realign to the host
+  const hostMap = cfg.map || '';
+  const hostFb = cfg.football ? 1 : 0;
+  const hostLvl = Math.max(1, Math.min(12, (cfg.level | 0) || 1));
+  if (hostMap === (MAP || '') && hostFb === (FOOTBALL ? 1 : 0) && hostLvl === startLevel) return;
+  const q = [];
+  if (hostMap) q.push('map=' + hostMap);
+  if (hostLvl > 1) q.push('level=' + hostLvl);
+  if (hostFb) q.push('football=1');
+  if (lastJoinCode) q.push('join=' + encodeURIComponent(lastJoinCode));
+  location.search = q.length ? '?' + q.join('&') : '?';
+}
 
 // weapon-swap discard: weapon.js reaches the drops system through the array
 // itself (getDrops().addDrop) — bridge the enemies API onto its stable array
@@ -252,7 +278,10 @@ function setCoop(text, cls) { if (coopStatus) { coopStatus.textContent = text; c
 net.onStatus?.((s, info) => {
   if (s === 'hosting') setCoop('Partagez ce code : ' + info, 'warn');
   else if (s === 'connecting') setCoop('Connexion…', 'warn');
-  else if (s === 'connected') setCoop('Coéquipier connecté — déploiement !', 'ok');
+  else if (s === 'connected') {
+    setCoop('Coéquipier connecté — déploiement !', 'ok');
+    if (net.isHost) sendWorldConfig();      // tell the joiner which décor/mode we're on
+  }
   else if (s === 'error') setCoop(info || 'Échec de la connexion', 'err');
   else if (s === 'closed') setCoop('Coéquipier déconnecté', 'err');
 });
@@ -265,9 +294,19 @@ coopJoin?.addEventListener('click', (e) => {
   e.stopPropagation();
   const c = (coopCode?.value || '').trim();
   if (c.length < 4) { setCoop('Saisissez le code à 4 caractères', 'err'); return; }
+  lastJoinCode = c.toUpperCase();
   setCoop('Connexion…', 'warn');
   net.join(c).then(() => setCoop('Connecté — déploiement !', 'ok')).catch(() => setCoop('Échec — vérifiez le code', 'err'));
 });
+
+// a joiner returning from a décor-realign reload reconnects automatically (?join=CODE)
+const AUTOJOIN = (params.get('join') || '').trim().toUpperCase();
+if (AUTOJOIN && !SHOT) {
+  lastJoinCode = AUTOJOIN;
+  if (coopCode) coopCode.value = AUTOJOIN;
+  setCoop('Reconnexion…', 'warn');
+  net.join(AUTOJOIN).then(() => setCoop('Connecté — déploiement !', 'ok')).catch(() => setCoop('Échec — vérifiez le code', 'err'));
+}
 
 // mode toggle button: full reload so every module rebuilds for the other mode
 const modeBtn = document.getElementById('modeToggle');
