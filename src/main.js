@@ -313,7 +313,7 @@ if (AUTOJOIN && !SHOT) {
 // mode toggle button: full reload so every module rebuilds for the other mode
 const modeBtn = document.getElementById('modeToggle');
 if (modeBtn) {
-  modeBtn.textContent = FOOTBALL ? '↩ back to combat mode' : '⚽ CR7 mode — footballs & Ronaldos';
+  modeBtn.textContent = FOOTBALL ? '↩ Retour au mode combat' : '⚽ Mode CR7 — ballons & Ronaldo';
   modeBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     location.search = FOOTBALL ? '' : '?football=1';

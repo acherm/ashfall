@@ -63,7 +63,8 @@
   #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10;
          font-family: "Helvetica Neue", Arial, sans-serif; }
   #menu { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
-          align-items: center; justify-content: center; cursor: pointer;
+          align-items: center; justify-content: safe center; cursor: pointer;
+          overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 22px 14px; box-sizing: border-box;
           background: radial-gradient(ellipse at 50% 40%, rgba(10,14,18,0.55), rgba(4,6,8,0.92) 75%);
           font-family: "Helvetica Neue", Arial, sans-serif; color: #e8e6e1;
           transition: opacity 0.5s ease; }
@@ -80,7 +81,7 @@
                 border: 1px solid rgba(214,185,106,0.4); padding: 10px 26px;
                 text-transform: uppercase; cursor: pointer; }
   #menu .mode:hover { background: rgba(214,185,106,0.12); }
-  #menu .diff { margin-top: 30px; display: flex; gap: 10px; }
+  #menu .diff { margin-top: 30px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 92vw; }
   #menu .diff .chip { font-size: 11px; letter-spacing: 3px; color: #9aa3ad;
                 border: 1px solid rgba(210,220,230,0.28); padding: 8px 16px;
                 text-transform: uppercase; cursor: pointer; transition: all .15s; }
@@ -107,6 +108,19 @@
   #coopStatus.warn { color: #d6b96a; }
   #coopStatus.err { color: #d9736a; }
   #coopStatus.ok { color: #7bc47f; }
+  /* short screens (landscape phones): compress the menu so the co-op block + code stay reachable */
+  @media (max-height: 600px) {
+    #menu { padding: 12px; }
+    #menu h1 { font-size: 30px; letter-spacing: 7px; margin: 0 0 2px 7px; }
+    #menu .sub { font-size: 9px; letter-spacing: 4px; }
+    #menu .start { margin-top: 14px; padding: 9px 28px; font-size: 12px; }
+    #menu .keys { display: none; }              /* keyboard legend is useless on touch */
+    #menu .difflabel { margin-top: 9px; }
+    #menu .diff { margin-top: 8px; gap: 7px; }
+    #menu .diff .chip { padding: 6px 11px; }
+    #menu .coop { margin-top: 7px; }
+    #menu .mode { margin-top: 12px; padding: 7px 18px; }
+  }
   @keyframes pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
   #death { position: fixed; inset: 0; z-index: 25; display: none;
            flex-direction: column; align-items: center; justify-content: center;
