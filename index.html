@@ -15,33 +15,37 @@
   #touch.on { display: block; }
   /* movement joystick — visible at rest (bottom-left) so it's obvious, floats to
      the thumb when touched. Shown whenever the touch overlay is on. */
-  #tstick { position: fixed; width: 138px; height: 138px;
-            border-radius: 50%; border: 2px dashed rgba(230,235,240,0.4);
-            background: rgba(180,190,200,0.10); display: none; pointer-events: none; }
+  #tstick { position: fixed; width: 160px; height: 160px;
+            border-radius: 50%; border: 3px solid rgba(235,240,245,0.5);
+            background: rgba(180,195,210,0.14); display: none; pointer-events: none;
+            box-shadow: 0 0 26px rgba(0,0,0,0.35); }
   #touch.on #tstick { display: block; }
-  #tknob { position: absolute; left: 50%; top: 50%; width: 62px; height: 62px;
-           margin: -31px 0 0 -31px; border-radius: 50%;
-           background: rgba(220,228,235,0.34); border: 2px solid rgba(230,235,240,0.6); }
-  #tstick::after { content: "MOVE"; position: absolute; left: 0; right: 0; top: -22px;
-           text-align: center; font: 11px/1 "Helvetica Neue", Arial; letter-spacing: 3px;
-           color: rgba(230,235,240,0.6); }
+  #tknob { position: absolute; left: 50%; top: 50%; width: 74px; height: 74px;
+           margin: -37px 0 0 -37px; border-radius: 50%;
+           background: rgba(225,232,240,0.42); border: 2px solid rgba(240,244,248,0.8); }
+  #tstick::after { content: "MOVE"; position: absolute; left: 0; right: 0; top: -24px;
+           text-align: center; font: 12px/1 "Helvetica Neue", Arial; letter-spacing: 4px;
+           color: rgba(240,244,248,0.85); text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
   .tbtn { position: fixed; display: flex; align-items: center; justify-content: center;
           border-radius: 50%; background: rgba(20,26,32,0.42); color: #dfe4e8;
           border: 1.5px solid rgba(220,228,235,0.35); font-family: "Helvetica Neue", Arial, sans-serif;
           font-size: 12px; letter-spacing: 1px; text-transform: uppercase; user-select: none;
           -webkit-user-select: none; }
   .tbtn.down { background: rgba(220,180,110,0.55); border-color: #ffd27a; color: #10151b; }
-  .tbtn.big { width: 96px; height: 96px; font-size: 15px; }
-  .tbtn.sm { width: 46px; height: 46px; font-size: 15px; }
-  #tfire { right: 26px; bottom: 118px; }
-  #taim { right: 138px; bottom: 150px; width: 74px; height: 74px; }
-  #tjump { right: 40px; bottom: 232px; width: 70px; height: 70px; }
-  #tcrouch { right: 150px; bottom: 60px; width: 70px; height: 70px; }
-  #treload { right: 232px; bottom: 96px; width: 66px; height: 66px; }
-  #tnade { right: 250px; bottom: 190px; width: 62px; height: 62px; }
-  #tsprint { left: 172px; bottom: 210px; width: 66px; height: 66px; }
-  #tinteract { left: 30px; bottom: 210px; width: 66px; height: 66px; }
-  #twslots { position: fixed; right: 20px; top: 96px; display: flex; gap: 10px; }
+  /* buttons clustered in the corners so the whole centre/right stays free for
+     look-drag. Secondary actions are dimmer/smaller. */
+  .tbtn.big { width: 104px; height: 104px; font-size: 15px;
+              background: rgba(30,36,42,0.5); border-color: rgba(230,238,245,0.5); }
+  .tbtn.sm { width: 48px; height: 48px; font-size: 15px; opacity: 0.72; }
+  /* two tidy right-edge columns; whole centre/right stays open for look-swipe */
+  #tfire { right: 32px; bottom: 32px; }
+  #tjump { right: 46px; bottom: 150px; width: 74px; height: 74px; }
+  #tnade { right: 54px; bottom: 258px; width: 56px; height: 56px; opacity: 0.75; }
+  #taim { right: 152px; bottom: 78px; width: 74px; height: 74px; }
+  #tcrouch { right: 158px; bottom: 186px; width: 60px; height: 60px; opacity: 0.82; }
+  #treload { right: 160px; bottom: 288px; width: 56px; height: 56px; opacity: 0.8; }
+  #tinteract { left: 30px; bottom: 236px; width: 60px; height: 60px; opacity: 0.82; }
+  #twslots { position: fixed; right: 18px; top: 88px; display: flex; gap: 9px; }
   #hud { position: fixed; inset: 0; pointer-events: none; z-index: 10;
          font-family: "Helvetica Neue", Arial, sans-serif; }
   #menu { position: fixed; inset: 0; z-index: 20; display: flex; flex-direction: column;
@@ -139,7 +143,6 @@
   <div id="tcrouch" class="tbtn">DUCK</div>
   <div id="treload" class="tbtn">R</div>
   <div id="tnade" class="tbtn">NADE</div>
-  <div id="tsprint" class="tbtn">RUN</div>
   <div id="tinteract" class="tbtn">E</div>
   <div id="twslots">
     <div id="tw1" class="tbtn sm">1</div>

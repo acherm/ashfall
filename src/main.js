@@ -280,7 +280,7 @@ const hintEl = document.getElementById('hint');
 let hintTimer = 0;
 if (IS_TOUCH && hintEl) {
   const r2 = hintEl.querySelector('.row2');
-  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick: drag to walk (up = forward) &nbsp;&middot;&nbsp; drag the <b>right side</b> to look &nbsp;&middot;&nbsp; buttons to fire / aim / jump';
+  if (r2) r2.innerHTML = 'Left <b>MOVE</b> stick &mdash; up = forward (push fully to sprint) &nbsp;&middot;&nbsp; swipe the <b>RIGHT side</b> to look &amp; turn &nbsp;&middot;&nbsp; corner buttons fire / aim / jump';
 }
 function showHint() {
   if (!hintEl) return;

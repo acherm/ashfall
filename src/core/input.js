@@ -277,7 +277,9 @@ export function createInput(canvas) {
     const stick = document.getElementById('tstick');
     const knob = document.getElementById('tknob');
     const RADIUS = 55;         // px travel for full deflection
-    const LOOK_SENS = 0.6;     // touch-drag px → look px (player applies its own sens)
+    const LOOK_SENS = 2.4;     // touch-drag px → look px — high so one thumb-swipe
+                               // across the right half turns you ~180° (was 0.6:
+                               // you had to swipe ~2 screen-widths to turn around)
 
     let moveId = null, mox = 0, moy = 0;   // move-stick touch id + origin
     let lookId = null, lpx = 0, lpy = 0;    // look touch id + last pos
@@ -287,9 +289,9 @@ export function createInput(canvas) {
     // rest the stick at a fixed bottom-left spot so the player SEES where to move
     function restStick() {
       if (!stick) return;
-      const cx = 106, cy = window.innerHeight - 116;
-      stick.style.left = (cx - 69) + 'px';
-      stick.style.top = (cy - 69) + 'px';
+      const cx = 120, cy = window.innerHeight - 128;
+      stick.style.left = (cx - 80) + 'px';
+      stick.style.top = (cy - 80) + 'px';
       if (knob) knob.style.transform = 'translate(0,0)';
     }
     function setStick(dx, dy) {
@@ -298,10 +300,13 @@ export function createInput(canvas) {
       const nx = (dx / len) * cl, ny = (dy / len) * cl;
       input.moveX = nx / RADIUS;
       input.moveY = ny / RADIUS;           // player reads f=-moveY, s=moveX
+      // auto-sprint: push the stick fully forward to run (no separate button)
+      if (input.moveY < -0.82) down.add('ShiftLeft'); else down.delete('ShiftLeft');
       if (knob) knob.style.transform = `translate(${nx}px, ${ny}px)`;
     }
     function endStick() {
       moveId = null; input.moveX = 0; input.moveY = 0;
+      down.delete('ShiftLeft');
       restStick();                         // return to the visible resting base
     }
 
@@ -347,8 +352,7 @@ export function createInput(canvas) {
     bindTap('treload', 'KeyR');
     bindTap('tnade', 'KeyG');
     bindTap('tinteract', 'KeyE');
-    bindTap('tsprint', 'ShiftLeft'); // hold-ish; toggled via down while pressed
-    bindHold('tsprint', 'ShiftLeft');
+    // sprint is automatic (push the move stick fully forward) — no RUN button
     bindTap('tw1', 'Digit1');
     bindTap('tw2', 'Digit2');
     bindTap('tw3', 'Digit3');
@@ -362,7 +366,7 @@ export function createInput(canvas) {
         if (leftZone && moveId === null) {
           moveId = t.identifier; mox = t.clientX; moy = t.clientY;
           // float the visible base to the thumb
-          if (stick) { stick.style.left = (mox - 69) + 'px'; stick.style.top = (moy - 69) + 'px'; }
+          if (stick) { stick.style.left = (mox - 80) + 'px'; stick.style.top = (moy - 80) + 'px'; }
           setStick(0, 0);
         } else if (!leftZone && lookId === null) {
           lookId = t.identifier; lpx = t.clientX; lpy = t.clientY;
