@@ -43,6 +43,26 @@ function makeCode() {
 }
 const PEER_PREFIX = 'ashfall-';
 
+// ICE servers: PeerJS defaults to a single Google STUN and NO TURN, so peers behind a
+// symmetric NAT (very common on mobile/cellular networks) can't open a P2P data channel
+// even though signalling succeeds — desktop↔desktop on friendly NATs works, mobile fails.
+// Add extra STUN + a free public TURN relay (Open Relay) incl. TURN-over-TCP/443 so the
+// connection can relay through restrictive networks. Passed to every Peer we create.
+const PEER_OPTS = {
+  debug: 0,
+  config: {
+    sdpSemantics: 'unified-plan',
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:openrelay.metered.ca:80' },
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+    ],
+  },
+};
+
 const clamp01 = (v) => (v < 0 ? 0 : v > 1 ? 1 : v);
 function wrapAngle(a) {
   while (a > Math.PI) a -= Math.PI * 2;
@@ -50,14 +70,15 @@ function wrapAngle(a) {
   return a;
 }
 function errMsg(err) {
-  if (!err) return 'Connection error';
+  if (!err) return 'Erreur de connexion';
   const t = err.type || '';
-  if (t === 'peer-unavailable') return 'No game found for that code';
-  if (t === 'unavailable-id') return 'Code in use — retrying';
+  if (t === 'peer-unavailable') return 'Aucune partie pour ce code';
+  if (t === 'unavailable-id') return 'Code déjà pris — nouvel essai';
   if (t === 'network' || t === 'server-error' || t === 'socket-error' || t === 'socket-closed')
-    return 'Network error — check your connection';
-  if (t === 'browser-incompatible') return 'Browser does not support WebRTC';
-  return err.message || String(t) || 'Connection error';
+    return 'Erreur réseau — vérifiez votre connexion';
+  if (t === 'browser-incompatible') return 'Navigateur sans support WebRTC';
+  if (t === 'timeout') return 'Connexion impossible (réseau/NAT) — réessayez';
+  return err.message || String(t) || 'Erreur de connexion';
 }
 
 /* ============================================================ avatar model
@@ -276,7 +297,7 @@ export function createNetplay({ scene }) {
         setStatus('hosting', code);
         let p;
         try {
-          p = new Peer(PEER_PREFIX + code, { debug: 0 });
+          p = new Peer(PEER_PREFIX + code, PEER_OPTS);
         } catch (err) {
           if (!settled) { settled = true; setStatus('error', errMsg(err)); reject(err); }
           return;
@@ -327,7 +348,7 @@ export function createNetplay({ scene }) {
 
       let p;
       try {
-        p = new Peer({ debug: 0 });
+        p = new Peer(PEER_OPTS);
       } catch (err) { fail(err); return; }
       peer = p;
 

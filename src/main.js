@@ -290,7 +290,7 @@ net.onStatus?.((s, info) => {
 coopHost?.addEventListener('click', (e) => {
   e.stopPropagation();
   setCoop('Création du salon…', 'warn');
-  net.host().then((code) => setCoop('Partagez ce code : ' + code, 'warn')).catch(() => setCoop('Hébergement impossible', 'err'));
+  net.host().then((code) => setCoop('Partagez ce code : ' + code, 'warn')).catch((e) => setCoop(e?.message || 'Hébergement impossible', 'err'));
 });
 coopJoin?.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -298,7 +298,7 @@ coopJoin?.addEventListener('click', (e) => {
   if (c.length < 4) { setCoop('Saisissez le code à 4 caractères', 'err'); return; }
   lastJoinCode = c.toUpperCase();
   setCoop('Connexion…', 'warn');
-  net.join(c).then(() => setCoop('Connecté — déploiement !', 'ok')).catch(() => setCoop('Échec — vérifiez le code', 'err'));
+  net.join(c).then(() => setCoop('Connecté — déploiement !', 'ok')).catch((e) => setCoop(e?.message || 'Échec — vérifiez le code', 'err'));
 });
 
 // a joiner returning from a décor-realign reload reconnects automatically (?join=CODE)
@@ -307,7 +307,7 @@ if (AUTOJOIN && !SHOT) {
   lastJoinCode = AUTOJOIN;
   if (coopCode) coopCode.value = AUTOJOIN;
   setCoop('Reconnexion…', 'warn');
-  net.join(AUTOJOIN).then(() => setCoop('Connecté — déploiement !', 'ok')).catch(() => setCoop('Échec — vérifiez le code', 'err'));
+  net.join(AUTOJOIN).then(() => setCoop('Connecté — déploiement !', 'ok')).catch((e) => setCoop(e?.message || 'Échec — vérifiez le code', 'err'));
 }
 
 // mode toggle button: full reload so every module rebuilds for the other mode
